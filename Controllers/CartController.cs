@@ -90,8 +90,9 @@ public class CartController : Controller
 			ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
 		}
 
-		ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
-		ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+		ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusApproved;
+		ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+        ShoppingCartVM.OrderHeader.PaymentDate = System.DateTime.Now;
 
 		_db.OrderHeaders.Add(ShoppingCartVM.OrderHeader);
 		_db.SaveChanges();
@@ -114,12 +115,8 @@ public class CartController : Controller
 		_db.ShoppingCarts.RemoveRange(shoppingCarts);
 		_db.SaveChanges();
 		HttpContext.Session.SetInt32(SD.SessionCart, 0);
+        TempData["success"] = "Thanh toán thành công!";
 
-        // Handle Payment Redirection
-        if (ShoppingCartVM.OrderHeader.PaymentMethod == SD.PaymentMethod_Bank || ShoppingCartVM.OrderHeader.PaymentMethod == SD.PaymentMethod_MoMo)
-        {
-            return RedirectToAction("ProcessPayment", "Payment", new { orderId = ShoppingCartVM.OrderHeader.Id });
-        }
 
 		return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
 	}
