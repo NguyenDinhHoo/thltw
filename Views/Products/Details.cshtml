@@ -1,0 +1,67 @@
+@model AspNetMvcProject.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-info text-white py-3">
+                    <h3 class="mb-0 fw-bold">Chi tiết sản phẩm</h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (Model.Images != null && Model.Images.Any())
+                    {
+                        <div id="productCarousel" class="carousel slide mb-4 shadow-sm rounded overflow-hidden" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.Images.Count; i++)
+                                {
+                                    var img = Model.Images.ElementAt(i);
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <img src="@img.ImageUrl" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="Ảnh sản phẩm">
+                                    </div>
+                                }
+                            </div>
+                            @if (Model.Images.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    <dl class="row mt-3">
+                        <dt class="col-sm-3 text-secondary">Danh mục</dt>
+                        <dd class="col-sm-9 fw-bold">@(Model.Category?.Name ?? "Chưa phân loại")</dd>
+
+                        <dt class="col-sm-3 text-secondary">Tên sản phẩm</dt>
+                        <dd class="col-sm-9 fw-bold fs-5">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-3 text-secondary">Mô tả</dt>
+                        <dd class="col-sm-9 text-muted">@Html.DisplayFor(model => model.Description)</dd>
+
+                        <dt class="col-sm-3 text-secondary">Giá bán</dt>
+                        <dd class="col-sm-9 text-success fw-bold fs-4">@Model.Price.ToString("C")</dd>
+
+                        <dt class="col-sm-3 text-secondary">Số lượng tồn</dt>
+                        <dd class="col-sm-9">@Html.DisplayFor(model => model.Stock)</dd>
+                    </dl>
+                </div>
+                <div class="card-footer bg-light p-4">
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning px-4 fw-bold">Chỉnh sửa</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Quay lại</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

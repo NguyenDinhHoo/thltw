@@ -1,0 +1,38 @@
+@model AspNetMvcProject.Models.Product
+
+@{
+    ViewData["Title"] = "Xóa sản phẩm";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-3">Bạn có chắc chắn muốn xóa?</h2>
+                    <p class="text-muted mb-4">Hành động này không thể hoàn tác. Sản phẩm <strong>@Model.Name</strong> sẽ bị xóa vĩnh viễn.</p>
+                    
+                    <div class="alert alert-light border mb-4 text-start">
+                        <div class="row">
+                            <div class="col-4 fw-bold">Giá:</div>
+                            <div class="col-8 text-success fw-bold">@Model.Price.ToString("C")</div>
+                            <div class="col-4 fw-bold">Tồn kho:</div>
+                            <div class="col-8">@Model.Stock</div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg shadow-sm">Xác nhận xóa</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

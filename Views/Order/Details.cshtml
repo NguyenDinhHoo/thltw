@@ -1,0 +1,106 @@
+@model AspNetMvcProject.Models.ViewModels.OrderVM
+
+<form method="post">
+    <input hidden asp-for="OrderHeader.Id" />
+    <br />
+    <div class="container">
+        <div class="card shadow border-0">
+            <div class="card-header bg-secondary bg-gradient text-light py-4">
+                <div class="row px-4">
+                    <div class="col-6">
+                        <h5 class="pt-2 text-white">Chi tiết đơn hàng #@Model.OrderHeader.Id</h5>
+                    </div>
+                    <div class="col-6 text-end">
+                        <a asp-action="Index" class="btn btn-outline-danger btn-sm text-uppercase">Quay lại danh sách</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+                        <div class="col-12 col-lg-6 pb-4">
+                            <div class="row">
+                                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="text-info">Thông tin giao hàng:</span>
+                                </h4>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Họ tên</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.FullName" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">SĐT</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.PhoneNumber" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Địa chỉ</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.StreetAddress" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Thành phố</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.City" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Ngày đặt</div>
+                                <div class="col-9">
+                                    <input value="@Model.OrderHeader.OrderDate.ToShortDateString()" readonly class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row my-1">
+                                <div class="col-3">Trạng thái</div>
+                                <div class="col-9">
+                                    <input asp-for="OrderHeader.OrderStatus" readonly class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 offset-lg-1">
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-info">Danh sách sản phẩm:</span>
+                            </h4>
+                            <ul class="list-group mb-3">
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between p-2">
+                                        <div class="row container">
+                                            <div class="col-8">
+                                                <h6 class="my-0 text-primary">@detail.Product.Name</h6>
+                                                <small class="text-muted">Giá: @detail.Price.ToString("c")</small><br />
+                                                <small class="text-muted">Số lượng: @detail.Count</small>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <p class="text-success">@((detail.Count * detail.Price).ToString("c"))</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                                <li class="list-group-item bg-info">
+                                    <div class="row container">
+                                        <div class="col-6">
+                                            <h5 class="text-white">TỔNG CỘNG </h5>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("c")</h5>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            @if (Model.OrderHeader.OrderStatus == AspNetMvcProject.Utility.SD.StatusPending || Model.OrderHeader.OrderStatus == AspNetMvcProject.Utility.SD.StatusApproved)
+                            {
+                                <button type="submit" asp-action="CancelOrder" asp-route-orderId="@Model.OrderHeader.Id" class="btn btn-danger form-control my-1">Hủy đơn hàng</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

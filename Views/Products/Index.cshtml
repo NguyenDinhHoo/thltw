@@ -1,0 +1,111 @@
+@model IEnumerable<AspNetMvcProject.Models.Product>
+
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 text-primary fw-bold">Quản lý Sản phẩm</h1>
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm ripple-effect">
+            <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-lg overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light border-bottom">
+                    <tr>
+                        <th class="px-4 py-3">Ảnh</th>
+                        <th class="py-3">Tên sản phẩm</th>
+                        <th class="py-3">Mô tả</th>
+                        <th class="py-3 text-center">Giá</th>
+                        <th class="py-3 text-center">Tồn kho</th>
+                        <th class="px-4 py-3 text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model) {
+                    <tr class="transition-all">
+                        <td class="px-4 py-3" style="width: 150px;">
+                            @if (item.Images != null && item.Images.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    <img src="@item.Images.First().ImageUrl" class="rounded shadow-sm border" style="width: 80px; height: 80px; object-fit: cover;" alt="Thumbnail" />
+                                    @if (item.Images.Count > 1)
+                                    {
+                                        <div class="d-flex flex-column gap-1">
+                                            @foreach (var additionalImg in item.Images.Skip(1).Take(2))
+                                            {
+                                                <img src="@additionalImg.ImageUrl" class="rounded border" style="width: 38px; height: 38px; object-fit: cover; opacity: 0.7;" />
+                                            }
+                                            @if (item.Images.Count > 3)
+                                            {
+                                                <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center border" style="width: 38px; height: 38px; font-size: 10px;">
+                                                    +@(item.Images.Count - 3)
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center border shadow-sm" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-image text-muted fs-2"></i>
+                                </div>
+                            }
+                        </td>
+                        <td class="py-3">
+                            <div class="fw-bold fs-6 text-dark">@item.Name</div>
+                            <div class="small">
+                                <span class="text-secondary">#@item.Id</span>
+                                @if (item.Category != null)
+                                {
+                                    <span class="badge bg-info-subtle text-info ms-2">@item.Category.Name</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="py-3 text-muted" style="max-width: 300px;">
+                            <div class="text-truncate">@item.Description</div>
+                        </td>
+                        <td class="py-3 text-center">
+                            <span class="badge bg-success-subtle text-success fs-6 px-3">@item.Price.ToString("C")</span>
+                        </td>
+                        <td class="py-3 text-center">
+                            @if (item.Stock > 0)
+                            {
+                                <span class="badge bg-primary-subtle text-primary fw-normal">Kho: @item.Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger fw-normal">Hết hàng</span>
+                            }
+                        </td>
+                        <td class="px-4 py-3 text-end">
+                            <div class="btn-group shadow-sm border rounded">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning border-0 px-3" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info border-0 px-3" title="Chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger border-0 px-3" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-all { transition: all 0.3s ease; }
+    .transition-all:hover { background-color: rgba(13, 110, 253, 0.05); transform: translateY(-2px); }
+    .ripple-effect:active { transform: scale(0.95); }
+</style>

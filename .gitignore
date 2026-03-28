@@ -1,0 +1,19 @@
+## Visual Studio
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
+.vs/
+.vscode/
+
+## User-specific files
+*.user
+*.userosscache
+*.sln.docuser
+*.suo
+
+
+## Environment
+appsettings.Development.json
+
+## Others
+.DS_Store

@@ -1,0 +1,129 @@
+@model IEnumerable<AspNetMvcProject.Models.Product>
+<div class="container mt-5">
+    <div class="row pb-3" id="productListContainer">
+        @foreach (var product in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4 animate-up product-item" style="animation-delay: @(Model.ToList().IndexOf(product) * 0.1)s">
+                <div class="glass-card product-card p-3 h-100 d-flex flex-column" data-product-id="@product.Id">
+                    <a asp-action="Details" asp-route-productId="@product.Id" class="text-decoration-none text-dark">
+                        <div class="img-container mb-3 shadow-sm">
+                            @if (product.Images != null && product.Images.Count > 0)
+                            {
+                                <img src="@product.Images.FirstOrDefault().ImageUrl" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <img src="https://placehold.co/500x600/png" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                            }
+                        </div>
+                        <div class="card-body p-0 mb-3">
+                            <h5 class="fw-bold mb-1 text-truncate">@product.Name</h5>
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="price-tag">@product.Price.ToString("c")</span>
+                                <small class="text-muted text-decoration-line-through">@((product.Price * 1.2m).ToString("c"))</small>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="mt-auto d-grid gap-2">
+                        <button class="btn btn-premium w-100 btn-add-to-cart" onclick="addToCart(@product.Id)">
+                            <i class="bi bi-cart-plus me-2"></i>Thêm giỏ hàng
+                        </button>
+                        <a asp-action="Details" asp-route-productId="@product.Id" class="btn btn-outline-primary btn-sm border-0">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById('globalSearchInput');
+        const container = document.getElementById('productListContainer');
+        let searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value;
+                
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 400);
+            });
+        }
+
+        async function performSearch(query) {
+            try {
+                container.style.opacity = '0.5';
+                const response = await fetch(`/api/products?search=${encodeURIComponent(query)}`);
+                const products = await response.json();
+                
+                renderProducts(products);
+                container.style.opacity = '1';
+            } catch (err) {
+                console.error('Search failed', err);
+            }
+        }
+
+        function renderProducts(products) {
+            if (products.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center py-5"><h3>Không tìm thấy sản phẩm nào phù hợp.</h3></div>';
+                return;
+            }
+
+            container.innerHTML = products.map((p, index) => `
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4 animate-up" style="animation-delay: ${index * 0.1}s">
+                    <div class="glass-card product-card p-3 h-100 d-flex flex-column">
+                        <a href="/Home/Details?productId=${p.id}" class="text-decoration-none text-dark">
+                            <div class="img-container mb-3 shadow-sm">
+                                <img src="${p.imageUrls.length > 0 ? p.imageUrls[0] : 'https://placehold.co/500x600/png'}" class="card-img-top" style="height: 250px; object-fit: cover;" />
+                            </div>
+                            <div class="card-body p-0 mb-3">
+                                <h5 class="fw-bold mb-1 text-truncate">${p.name}</h5>
+                                <div class="d-flex align-items-baseline gap-2">
+                                    <span class="price-tag">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}</span>
+                                    <small class="text-muted text-decoration-line-through">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price * 1.2)}</small>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="mt-auto d-grid gap-2">
+                            <button class="btn btn-premium w-100" onclick="addToCart(${p.id})">
+                                <i class="bi bi-cart-plus me-2"></i>Thêm giỏ hàng
+                            </button>
+                            <a href="/Home/Details?productId=${p.id}" class="btn btn-outline-primary btn-sm border-0">
+                                Xem chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function addToCart(productId) {
+            try {
+                const response = await fetch(`/Home/AddToCartQuick?productId=${productId}`, {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    location.reload(); // Refresh to update cart count in navbar
+                } else {
+                    alert(result.message);
+                    if (result.message === "Vui lòng đăng nhập!") {
+                        window.location.href = '/Account/Login';
+                    }
+                }
+            } catch (err) {
+                console.error('Add to cart failed', err);
+                alert('Lỗi khi thêm vào giỏ hàng.');
+            }
+        }
+    </script>
+}

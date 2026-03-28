@@ -1,0 +1,77 @@
+@model IEnumerable<AspNetMvcProject.Models.ApplicationUser>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary bg-gradient py-3">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h2 class="text-white py-2">Quản lý Người dùng</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <table class="table table-bordered table-striped" style="width:100%">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Tên đăng nhập</th>
+                                <th>Họ và tên</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var obj in Model)
+                            {
+                                <tr>
+                                    <td>@obj.Username</td>
+                                    <td>@obj.FullName</td>
+                                    <td>@obj.Email</td>
+                                    <td>
+                                        <span class="badge @(obj.Role == AspNetMvcProject.Utility.SD.Role_Admin ? "bg-danger" : "bg-info")">
+                                            @obj.Role
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <form asp-action="ChangeRole" method="post">
+                                                <input type="hidden" name="userId" value="@obj.Id" />
+                                                <button type="submit" class="btn btn-warning btn-sm" title="Thay đổi quyền">
+                                                    <i class="bi bi-person-badge"></i>
+                                                </button>
+                                            </form>
+                                            <a asp-action="Edit" asp-route-userId="@obj.Id" class="btn btn-info btn-sm" title="Sửa">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form asp-action="Delete" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')">
+                                                <input type="hidden" name="userId" value="@obj.Id" />
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Xóa">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success mt-3">
+        @TempData["success"]
+    </div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        @TempData["error"]
+    </div>
+}

@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid mt-5 px-5 animate-up">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-3 fw-bold text-dark mb-2">Hệ Thống Quản Trị</h1>
+            <p class="lead text-muted">Quản lý toàn bộ hệ thống của bạn một cách trực quan và hiện đại.</p>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-md-4">
+            <div class="dashboard-card shadow" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                <i class="bi bi-box-seam"></i>
+                <h2 class="fw-bold">Sản phẩm</h2>
+                <p class="opacity-75">Cập nhật kho hàng và danh sách sản phẩm.</p>
+                <a asp-controller="Products" asp-action="Index" asp-area="" class="btn btn-light rounded-pill px-4 mt-3 fw-bold shadow-sm">Thiết lập ngay</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card shadow" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <i class="bi bi-tags"></i>
+                <h2 class="fw-bold">Danh mục</h2>
+                <p class="opacity-75">Tổ chức phân loại sản phẩm thông minh.</p>
+                <a asp-controller="Categories" asp-action="Index" asp-area="" class="btn btn-light rounded-pill px-4 mt-3 fw-bold shadow-sm">Quản lý ngay</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card shadow" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
+                <i class="bi bi-people"></i>
+                <h2 class="fw-bold">Người dùng</h2>
+                <p class="opacity-75">Phân quyền và quản lý tài khoản thành viên.</p>
+                <a asp-area="Admin" asp-controller="User" asp-action="Index" class="btn btn-light rounded-pill px-4 mt-3 fw-bold shadow-sm">Kiểm soát ngay</a>
+            </div>
+        </div>
+    </div>
+</div>

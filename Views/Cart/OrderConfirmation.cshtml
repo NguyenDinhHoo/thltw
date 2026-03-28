@@ -1,0 +1,15 @@
+@model int
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="text-primary display-3"><i class="bi bi-check-circle-fill"></i>Đặt hàng thành công!</h1>
+            <p class="lead">Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi.</p>
+            <div class="alert alert-success d-inline-block">
+                Mã đơn hàng của bạn là: <strong>#@Model</strong>
+            </div>
+            <br />
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-lg mt-3">Tiếp tục mua sắm</a>
+        </div>
+    </div>
+</div>

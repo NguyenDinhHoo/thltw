@@ -1,0 +1,29 @@
+@model AspNetMvcProject.Models.Category
+
+@{
+    ViewData["Title"] = "Thêm Danh mục";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg mt-5">
+            <div class="card-header bg-primary text-white py-3">
+                <h3 class="mb-0 fw-bold">Thêm danh mục mới</h3>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control" placeholder="Tên danh mục" />
+                        <label asp-for="Name">Tên danh mục</label>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">Lưu danh mục</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

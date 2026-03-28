@@ -1,0 +1,700 @@
+@if (false) { } @* Dummy server-side code to ensure standard layout is used *@
+@{
+    ViewData["Title"] = "API Test Page";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center text-primary">API Developer Console</h1>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="apiTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button">📦 Sản phẩm</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" onclick="loadCategoriesList()">🏷️ Danh mục</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="cart-tab" data-bs-toggle="tab" data-bs-target="#cart" type="button" onclick="loadCart()">🛒 Giỏ hàng</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button" onclick="loadOrders()">📦 Đơn hàng</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="apiTabsContent">
+        <!-- Products Tab -->
+        <div class="tab-pane fade show active" id="products" role="tabpanel">
+            <!-- Form Section -->
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0" id="formTitle">Tạo Sản phẩm Mới</h5>
+                </div>
+                <div class="card-body">
+                    <form id="productForm">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label text-danger fw-bold">ID (Để Cập nhật)</label>
+                                <input type="number" id="productId" class="form-control border-danger" placeholder="Nhập ID..." oninput="handleIdChange()" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tên Sản phẩm</label>
+                                <input type="text" id="name" class="form-control" placeholder="Nhập tên sản phẩm..." required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Giá</label>
+                                <input type="number" id="price" class="form-control" step="0.01" required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Tồn kho</label>
+                                <input type="number" id="stock" class="form-control" required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Danh mục (ID)</label>
+                                <input type="number" id="categoryId" class="form-control" value="1" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Chọn ảnh sản phẩm</label>
+                                <input type="file" id="images" class="form-control" multiple accept="image/*" />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Mô tả</label>
+                                <textarea id="description" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div id="imagePreview" class="col-12 d-flex flex-wrap gap-2 mt-2"></div>
+                            <div class="col-12 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4" id="btnSubmit">Lưu Sản phẩm</button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">Làm mới</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Danh sách Sản phẩm</h5>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadProducts()">Tải lại danh sách</button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 p-3">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên</th>
+                                    <th>Giá</th>
+                                    <th>Tồn kho</th>
+                                    <th>Danh mục</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div class="tab-pane fade" id="categories" role="tabpanel">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0" id="catFormTitle">Quản lý Danh mục</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="categoryForm">
+                                <input type="hidden" id="catId" />
+                                <div class="mb-3">
+                                    <label class="form-label">Tên danh mục</label>
+                                    <input type="text" id="catName" class="form-control" required />
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-info text-white" id="btnCatSubmit">Lưu Danh mục</button>
+                                    <button type="button" class="btn btn-light" onclick="resetCatForm()">Làm mới</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Danh sách Danh mục</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên Danh mục</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Tab -->
+        <div class="tab-pane fade" id="cart" role="tabpanel">
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Thêm thử vào giỏ hàng (Test API)</h5>
+                </div>
+                <div class="card-body">
+                    <form id="cartForm">
+                        <input type="hidden" id="cartEditId" />
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label text-dark fw-bold">ID Sản phẩm</label>
+                                <input type="number" id="cartProductId" class="form-control" placeholder="Nhập ID sản phẩm..." required />
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label text-dark fw-bold">Số lượng</label>
+                                <input type="number" id="cartCount" class="form-control" value="1" min="1" required />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-dark w-100">Thêm vào Cart</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Giỏ hàng của tôi (Từ API)</h5>
+                    <button class="btn btn-sm btn-outline-light" onclick="loadCart()">Tải lại Giỏ hàng</button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartList"></tbody>
+                    </table>
+                    <div id="cartEmptyMsg" class="p-5 text-center text-muted" style="display:none;">
+                        <i class="bi bi-cart-x display-4"></i>
+                        <p class="mt-2">Giỏ hàng trống hoặc chưa đăng nhập.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div class="tab-pane fade" id="orders" role="tabpanel">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Đặt hàng mới (Test API)</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="orderForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Tên người nhận</label>
+                                    <input type="text" id="orderFullName" class="form-control" placeholder="Nguyễn Văn A" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="text" id="orderPhone" class="form-control" placeholder="090..." required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Địa chỉ</label>
+                                    <input type="text" id="orderAddress" class="form-control" placeholder="Số 1, Đường X..." required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Thành phố</label>
+                                    <input type="text" id="orderCity" class="form-control" placeholder="Hà Nội" required />
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-check-circle me-2"></i>Xác nhận Đặt hàng
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Lịch sử Đơn hàng</h5>
+                            <button class="btn btn-sm btn-outline-light" onclick="loadOrders()">Tải lại</button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="orderList"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const API_URL = '/api/products';
+        const CAT_API_URL = '/api/categories';
+        const CART_API_URL = '/api/cart';
+        const ORDER_API_URL = '/api/orders';
+        let selectedDeleteImageIds = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+
+            document.getElementById('productForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProduct();
+            });
+
+            document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveCategory();
+            });
+
+            document.getElementById('cartForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveCartItem();
+            });
+
+            document.getElementById('orderForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await placeOrder();
+            });
+        });
+        
+        function editCartItem(id, productId, count) {
+            document.getElementById('cartEditId').value = id;
+            document.getElementById('cartProductId').value = productId;
+            document.getElementById('cartCount').value = count;
+            alert('Đã tải thông tin vào form "Thêm thử vào giỏ hàng" để bạn chỉnh sửa.');
+        }
+
+        // --- Orders Logic ---
+        async function loadOrders() {
+            try {
+                const response = await fetch(ORDER_API_URL);
+                if (response.status === 401) {
+                    document.getElementById('orderList').innerHTML = '<tr><td colspan="5" class="text-center">Chưa đăng nhập</td></tr>';
+                    return;
+                }
+                const orders = await response.json();
+                const list = document.getElementById('orderList');
+                list.innerHTML = '';
+
+                orders.forEach(o => {
+                    const date = new Date(o.orderDate).toLocaleString();
+                    list.innerHTML += `
+                        <tr>
+                            <td>${o.id}</td>
+                            <td>${date}</td>
+                            <td class="fw-bold text-primary">$${o.orderTotal.toFixed(2)}</td>
+                            <td><span class="badge bg-success">${o.orderStatus}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info" onclick="alert('Order ID: ${o.id}\\nNgười nhận: ${o.fullName}')">Chi tiết</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function placeOrder() {
+            const formData = new FormData();
+            formData.append('FullName', document.getElementById('orderFullName').value);
+            formData.append('PhoneNumber', document.getElementById('orderPhone').value);
+            formData.append('StreetAddress', document.getElementById('orderAddress').value);
+            formData.append('City', document.getElementById('orderCity').value);
+
+            try {
+                const response = await fetch(ORDER_API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Đặt hàng thành công!');
+                    document.getElementById('orderForm').reset();
+                    loadOrders();
+                    loadCart(); // Cart should be cleared
+                } else {
+                    const err = await response.json();
+                    alert('Lỗi đặt hàng: ' + (err.title || JSON.stringify(err)));
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        // --- Categories Logic ---
+        async function loadCategoriesList() {
+            try {
+                const response = await fetch(CAT_API_URL);
+                const categories = await response.json();
+                const list = document.getElementById('categoryList');
+                list.innerHTML = '';
+
+                categories.forEach(c => {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${c.id}</td>
+                            <td>${c.name}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info text-white" onclick="editCategory(${c.id}, '${c.name}')">Sửa</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})">Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function saveCategory() {
+            const id = document.getElementById('catId').value;
+            const name = document.getElementById('catName').value;
+            const isUpdate = id && id !== '';
+            
+            const formData = new FormData();
+            formData.append('name', name);
+            if (isUpdate) formData.append('id', id);
+
+            const method = isUpdate ? 'PUT' : 'POST';
+            const url = isUpdate ? `${CAT_API_URL}/${id}` : CAT_API_URL;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Lưu danh mục thành công!');
+                    resetCatForm();
+                    loadCategoriesList();
+                } else {
+                    const err = await response.json();
+                    alert('Lỗi: ' + (err.title || JSON.stringify(err)));
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        function editCategory(id, name) {
+            document.getElementById('catId').value = id;
+            document.getElementById('catName').value = name;
+            document.getElementById('catFormTitle').innerText = 'Sửa Danh mục ID: ' + id;
+            document.getElementById('btnCatSubmit').className = 'btn btn-warning w-100';
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Xóa danh mục này?')) return;
+            try {
+                const response = await fetch(`${CAT_API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Xóa thành công!');
+                    loadCategoriesList();
+                } else {
+                    const err = await response.text();
+                    alert('Lỗi: ' + err);
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        function resetCatForm() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('catId').value = '';
+            document.getElementById('catFormTitle').innerText = 'Quản lý Danh mục';
+            document.getElementById('btnCatSubmit').className = 'btn btn-info text-white w-100';
+        }
+
+        // --- Cart Logic ---
+        async function saveCartItem() {
+            const id = document.getElementById('cartEditId')?.value; // Nullable if not update
+            const productId = document.getElementById('cartProductId').value;
+            const count = document.getElementById('cartCount').value;
+
+            const formData = new FormData();
+            formData.append('ProductId', productId);
+            formData.append('Count', count);
+
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${CART_API_URL}/${id}` : CART_API_URL;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Đã thêm vào giỏ hàng thành công (API)!');
+                    document.getElementById('cartForm').reset();
+                    loadCart();
+                } else {
+                    const err = await response.json();
+                    alert('Lỗi: ' + (err.title || JSON.stringify(err)));
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+        async function loadCart() {
+            try {
+                const response = await fetch(CART_API_URL);
+                if (response.status === 401) {
+                    document.getElementById('cartList').innerHTML = '';
+                    document.getElementById('cartEmptyMsg').style.display = 'block';
+                    return;
+                }
+                const items = await response.json();
+                const list = document.getElementById('cartList');
+                const emptyMsg = document.getElementById('cartEmptyMsg');
+                list.innerHTML = '';
+
+                if (!items || items.length === 0) {
+                    emptyMsg.style.display = 'block';
+                } else {
+                    emptyMsg.style.display = 'none';
+                    items.forEach(item => {
+                        list.innerHTML += `
+                            <tr>
+                                <td><img src="${item.productImageUrl || '/images/no-image.png'}" style="width:50px; height:50px; object-fit:cover;" class="rounded" /></td>
+                                <td>${item.productName} (ID: ${item.productId})</td>
+                                <td>$${item.productPrice.toFixed(2)}</td>
+                                <td><span class="badge bg-secondary">${item.count}</span></td>
+                                <td class="fw-bold text-success">$${(item.productPrice * item.count).toFixed(2)}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info text-white" onclick="editCartItem(${item.id}, ${item.productId}, ${item.count})">Sửa</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${item.id})">Xóa</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function removeFromCart(id) {
+            if (!confirm('Xóa sản phẩm này khỏi giỏ hàng?')) return;
+            try {
+                const response = await fetch(`${CART_API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    loadCart();
+                } else {
+                    alert('Lỗi khi xóa khỏi giỏ hàng.');
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        // --- Existing Products Logic ---
+
+        let idTimeout;
+        function handleIdChange() {
+            clearTimeout(idTimeout);
+            const id = document.getElementById('productId').value;
+            
+            if (id && id.trim() !== '') {
+                // Wait a bit while typing to avoid too many requests
+                idTimeout = setTimeout(() => {
+                    editProduct(id);
+                }, 500);
+            } else {
+                resetForm(true); // Don't clear the ID field that we just cleared
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await fetch(API_URL);
+                const products = await response.json();
+                const list = document.getElementById('productList');
+                list.innerHTML = '';
+
+                products.forEach(p => {
+                    list.innerHTML += `
+                        <tr>
+                            <td>${p.id}</td>
+                            <td>${p.name}</td>
+                            <td>$${p.price.toFixed(2)}</td>
+                            <td>${p.stock}</td>
+                            <td>${p.categoryName || 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editProduct(${p.id})">Sửa</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${p.id})">Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                alert('Lỗi khi tải danh sách: ' + err.message);
+            }
+        }
+
+        async function saveProduct() {
+            const idValue = document.getElementById('productId').value;
+            const formData = new FormData();
+            
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('price', document.getElementById('price').value || 0);
+            formData.append('stock', document.getElementById('stock').value || 0);
+            formData.append('categoryId', document.getElementById('categoryId').value || '');
+
+            const imageInput = document.getElementById('images');
+            if (imageInput.files.length > 0) {
+                for (let i = 0; i < imageInput.files.length; i++) {
+                    formData.append('Images', imageInput.files[i]);
+                }
+            }
+
+            const isUpdate = idValue && idValue.trim() !== '';
+            const method = isUpdate ? 'PUT' : 'POST';
+            const url = isUpdate ? `${API_URL}/${idValue}` : API_URL;
+
+            if (isUpdate) {
+                formData.append('id', idValue);
+                selectedDeleteImageIds.forEach(deletedId => {
+                    formData.append('deleteImageIds', deletedId);
+                });
+            }
+
+            console.log('Sending Request (FormData):', { method, url });
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    // Browser sets Content-Type to multipart/form-data with boundary automatically
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert(isUpdate ? 'Cập nhật thành công!' : 'Tạo mới thành công!');
+                    resetForm();
+                    loadProducts();
+                } else {
+                    const error = await response.json();
+                    console.error('API Error:', error);
+                    alert('Lỗi API: ' + (error.title || 'Không xác định') + '\n' + JSON.stringify(error.errors || error));
+                }
+            } catch (err) {
+                console.error('Fetch Error:', err);
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        function markImageForDeletion(imageId, btn) {
+            if (!confirm('Xác nhận xóa ảnh này khi cập nhật?')) return;
+            selectedDeleteImageIds.push(imageId);
+            btn.parentElement.style.opacity = '0.3';
+            btn.parentElement.style.pointerEvents = 'none';
+        }
+
+        async function editProduct(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const p = await response.json();
+
+                document.getElementById('productId').value = p.id;
+                document.getElementById('name').value = p.name;
+                document.getElementById('description').value = p.description || '';
+                document.getElementById('price').value = p.price;
+                document.getElementById('stock').value = p.stock;
+                document.getElementById('categoryId').value = p.categoryId || 1;
+
+                // Show previews of current images with delete buttons
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = '';
+                selectedDeleteImageIds = []; // Global variable
+
+                if (p.images && p.images.length > 0) {
+                    p.images.forEach(img => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'position-relative';
+                        wrapper.innerHTML = `
+                            <img src="${img.imageUrl}" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" />
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0" 
+                                    style="width: 20px; height: 20px; font-size: 12px; line-height: 1;"
+                                    onclick="markImageForDeletion(${img.id}, this)">×</button>
+                        `;
+                        preview.appendChild(wrapper);
+                    });
+                }
+
+                document.getElementById('formTitle').innerText = 'Cập nhật Sản phẩm (ID: ' + p.id + ')';
+                document.getElementById('btnSubmit').className = 'btn btn-warning';
+                window.scrollTo(0, 0);
+            } catch (err) {
+                alert('Lỗi khi lấy thông tin sản phẩm: ' + err.message);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Xóa thành công!');
+                    loadProducts();
+                } else {
+                    alert('Lỗi khi xóa!');
+                }
+            } catch (err) {
+                alert('Lỗi hệ thống: ' + err.message);
+            }
+        }
+
+        function resetForm(keepId = false) {
+            const currentId = document.getElementById('productId').value;
+            document.getElementById('productForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            selectedDeleteImageIds = [];
+            
+            if (keepId) {
+                document.getElementById('productId').value = currentId;
+            } else {
+                document.getElementById('productId').value = '';
+            }
+            
+            document.getElementById('formTitle').innerText = 'Tạo Sản phẩm Mới';
+            document.getElementById('btnSubmit').className = 'btn btn-success';
+        }
+    </script>
+}

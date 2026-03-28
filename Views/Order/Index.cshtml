@@ -1,0 +1,67 @@
+@model IEnumerable<OrderHeader>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary bg-gradient py-3">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <h2 class="text-white py-2">Lịch sử Đơn hàng</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <table class="table table-bordered table-striped" style="width:100%">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Họ tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Ngày đặt</th>
+                                <th>Tổng tiền</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.FullName</td>
+                                    <td>@item.PhoneNumber</td>
+                                    <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@item.OrderTotal.ToString("c")</td>
+                                    <td>
+                                        <span class="badge @(item.OrderStatus == AspNetMvcProject.Utility.SD.StatusCancelled ? "bg-danger" : "bg-success")">
+                                            @item.OrderStatus
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-action="Details" asp-route-orderId="@item.Id" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye me-1"></i> Chi tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success mt-3 mx-4">
+        @TempData["success"]
+    </div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger mt-3 mx-4">
+        @TempData["error"]
+    </div>
+}

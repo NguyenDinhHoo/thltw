@@ -1,0 +1,46 @@
+@model OrderHeader
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4 text-center">
+                    <h3><i class="bi bi-shield-lock-fill me-2"></i>Cổng Thanh Toán Mô Phỏng</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        @if (Model.PaymentMethod == AspNetMvcProject.Utility.SD.PaymentMethod_MoMo)
+                        {
+                            <h4 class="text-primary">Thanh toán qua Ví MoMo</h4>
+                            <i class="bi bi-wallet2 display-1 text-primary"></i>
+                        }
+                        else
+                        {
+                            <h4 class="text-primary">Chuyển khoản Ngân hàng</h4>
+                            <i class="bi bi-bank display-1 text-primary"></i>
+                        }
+                    </div>
+                    
+                    <div class="alert alert-secondary">
+                        <p><strong>Mã đơn hàng:</strong> #@Model.Id</p>
+                        <p><strong>Số tiền cần thanh toán:</strong> <span class="h4 text-danger">@Model.OrderTotal.ToString("c")</span></p>
+                        <hr />
+                        <p class="small text-muted">Đây là trang mô phỏng quy trình thanh toán thực tế. Vui lòng chọn kết quả thanh toán bên dưới.</p>
+                    </div>
+
+                    <form asp-action="ConfirmPayment" method="post">
+                        <input type="hidden" name="orderId" value="@Model.Id" />
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="success" value="true" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>Xác nhận Thanh toán Thành công
+                            </button>
+                            <button type="submit" name="success" value="false" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle me-2"></i>Hủy bỏ / Từ chối Giao dịch
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
